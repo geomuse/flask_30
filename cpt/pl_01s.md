@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  08/30-flask 重定向
+title:  01/30-flask 重定向
 date:   2024-09-11 11:24:29 +0800
 categories: 
     - python 
