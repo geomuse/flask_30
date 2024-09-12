@@ -73,7 +73,7 @@ def send_mail():
         msg = MIMEText("I\'m geo.")
         msg["Subject"] = "..."
         msg["From"] = "boonhong565059@gmail.com"
-        msg["To"] = "boonhong56789@gmail.com"
+        msg["To"] = "boonhong565059@gmail.com"
         
         # 连接 Gmail SMTP 服务器
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
@@ -94,4 +94,5 @@ def send_mail():
         print(f"Failed to send email: {e}")
 
 if __name__ == '__main__' :
+
     send_mail()
