@@ -1,43 +1,32 @@
-from flask import Flask, jsonify, request
-from pymongo import MongoClient
+from flask import Flask, render_template, redirect, url_for, flash
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, EqualTo, Length, Email
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your_secret_key'  # 用于表单 CSRF 保护
 
-# 连接到 MongoDB
-client = MongoClient("mongodb://localhost:27017/")
-db = client["recipe"]  # 创建/选择数据库
-collection = db["info"]  # 创建/选择集合
+# 注册表单类
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
 
-# 主页路由
-@app.route('/')
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Sign Up')
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        flash(f'Account created for {form.username.data}!', 'success')
+        return redirect(url_for('home'))
+    return render_template('register.html', title='Register', form=form)
+
+@app.route("/")
 def home():
-    return "Welcome to the Flask MongoDB app!"
-
-# 插入数据到 MongoDB
-@app.route('/add', methods=['POST'])
-# curl -X POST http://127.0.0.1:5000/add -H "Content-Type: application/json" -d '{"name": "Alice", "age": 30}'
-def add_data():
-    data = request.json
-    collection.insert_one(data)
-    return jsonify({"message": "Data inserted successfully!"}), 201
-
-# 获取数据
-@app.route('/data', methods=['GET'])
-def get_data():
-    data = list(collection.find({}, {"_id": 0}))  # 不返回 _id 字段
-    return jsonify(data), 200
-
-@app.route('/update/<name>', methods=['PUT'])
-def update_data(name):
-    data = request.json
-    collection.update_one({"name": name}, {"$set": data})
-    return jsonify({"message": "Data updated successfully!"}), 200
-
-@app.route('/delete/<name>', methods=['DELETE'])
-def delete_data(name):
-    collection.delete_one({"name": name})
-    return jsonify({"message": "Data deleted successfully!"}), 200
+    return render_template('index.html')
 
 if __name__ == '__main__':
-    
+
     app.run(debug=True)
