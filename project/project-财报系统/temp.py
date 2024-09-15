@@ -1,3 +1,4 @@
+#%%
 from flask import Flask, render_template, request
 import yfinance as yf
 import pandas as pd
@@ -5,8 +6,9 @@ from datetime import datetime, timedelta
 import plotly.graph_objs as go
 import plotly.utils
 import json
-
-app = Flask(__name__)
+import matplotlib.pyplot as pt
+from matplotlib import style
+style.use('ggplot')
 
 # 财务术语翻译字典
 financial_terms = {
@@ -23,7 +25,7 @@ financial_terms = {
     'Operating Cash Flow': '经营活动现金流',
     'Investing Cash Flow': '投资活动现金流',
     'Financing Cash Flow': '筹资活动现金流',
-    'EBIT': '负债',
+    # 'EBIT': '负债',
     # 添加更多术语翻译...
 }
 
@@ -32,6 +34,15 @@ def translate_index(df):
     return df
 
 def get_financial_data(ticker):
+    stock = yf.Ticker(ticker)
+    
+    # 获取过去3年的财务报表
+    income_statement = translate_index(stock.financials)
+    balance_sheet = translate_index(stock.balance_sheet)
+    cash_flow = translate_index(stock.cashflow)
+    return income_statement, balance_sheet, cash_flow
+
+def get_financial_data_(ticker):
     stock = yf.Ticker(ticker)
     
     # 获取过去3年的财务报表
@@ -44,7 +55,7 @@ def get_financial_data(ticker):
     start_date = end_date - timedelta(days=365*3)
     stock_price = stock.history(start=start_date, end=end_date)
     
-    return income_statement, balance_sheet, cash_flow, stock_price
+    return income_statement, balance_sheet, cash_flow
 
 def create_stock_chart(stock_price):
     fig = go.Figure(data=[go.Candlestick(x=stock_price.index,
@@ -52,36 +63,31 @@ def create_stock_chart(stock_price):
                 high=stock_price['High'],
                 low=stock_price['Low'],
                 close=stock_price['Close'])])
-    fig.update_layout(title='Stock Price Over the Past Year / 过去三年的股票价格',
+    fig.update_layout(title='Stock Price Over the Past Year / 过去一年的股票价格',
                       xaxis_title='Date / 日期',
                       yaxis_title='Price / 价格')
     return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        ticker = request.form['ticker']
-        try:
-            income_statement, balance_sheet, cash_flow, stock_price = get_financial_data(ticker)
-            # 将DataFrame转换为HTML表格
-            income_html = income_statement.to_html(classes='table table-striped')
-            balance_html = balance_sheet.to_html(classes='table table-striped')
-            cash_flow_html = cash_flow.to_html(classes='table table-striped')
-            
-            # 创建股票价格图表
-            stock_chart = create_stock_chart(stock_price)
-            
-            return render_template('result.html', 
-                                   ticker=ticker,
-                                   income_statement=income_html,
-                                   balance_sheet=balance_html,
-                                   cash_flow=cash_flow_html,
-                                   stock_chart=stock_chart)
-        except Exception as e:
-            error_message = f"Error fetching data / 获取数据时出错: {str(e)}"
-            return render_template('index.html', error=error_message)
-    return render_template('index.html')
 
-if __name__ == '__main__':
-    
-    app.run(debug=True)
+income_statement, balance_sheet, cash_flow = get_financial_data_('GOOG')
+
+#%%
+balance_sheet.iloc[0:3]
+#%%
+# 将DataFrame转换为HTML表格
+# income_html = income_statement.to_html(classes='table table-striped')
+# balance_html = balance_sheet.to_html(classes='table table-striped')
+# cash_flow_html = cash_flow.to_html(classes='table table-striped')
+# print(balance_sheet['2023-12-31'] , balance_sheet['2022-12-31'] , balance_sheet['2021-12-31'])
+# print(balance_sheet.index)
+
+x , y , z = balance_sheet['2023-12-31'][1] , balance_sheet['2022-12-31'][1] , balance_sheet['2021-12-31'][1] 
+pt.plot(['A','B','C'],[z,y,x],'o-')
+pt.title(balance_sheet.index[1])
+
+# 创建股票价格图表
+# stock_chart = create_stock_chart(stock_price)
+
+# print(stock_price)
+# pt.plot(stock_price['Close'])
+pt.show()

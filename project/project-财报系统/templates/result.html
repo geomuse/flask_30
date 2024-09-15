@@ -12,13 +12,19 @@
         <h1>Financial Report for / {{ ticker }} 的财报</h1>
         <h2>Stock Price Chart / 股票价格图表</h2>
         <div id="stock-chart"></div>
+
         <h2>Income Statement / 收益表</h2>
         {{ income_statement | safe }}
+
         <h2>Balance Sheet / 资产负债表</h2>
         {{ balance_sheet | safe }}
+
         <h2>Cash Flow Statement / 现金流量表</h2>
         {{ cash_flow | safe }}
         <a href="/" class="btn btn-primary mt-3">Return to Home / 返回首页</a>
+        <br>
+        <br>
+        <br>
     </div>
     <script>
         var graphJSON = {{ stock_chart | safe }};
