@@ -25,7 +25,24 @@ financial_terms = {
     'Operating Cash Flow': '经营活动现金流',
     'Investing Cash Flow': '投资活动现金流',
     'Financing Cash Flow': '筹资活动现金流',
-    # 'EBIT': '负债',
+    'Tax Effect Of Unusual Items' : '不寻常物品的税收影响' ,
+    'Tax Rate For Calcs' : '计算税率' ,
+    'Normalized EBITDA' : '标准化 EBITDA' ,
+    'Total Unusual Items' : '异常物品总数' ,
+    'Total Unusual Items Excluding Goodwill' : '不包括商誉的异常项目总数' ,
+    'Net Income From Continuing Operation Net Minority Interest' : '持续经营净利润 少数股东权益净额' ,
+    'Reconciled Depreciation' : '调节折旧' ,
+    'Reconciled Cost Of Revenue' : '经调节的收入成本/经调节的收入成本' ,
+    'EBITDA' : '息税折旧摊销前利润' ,
+    'EBIT' : '负债' ,
+    'Net Interest Income' : '净利息收入',
+    'Interest Expense' : '利息支出' ,
+    'Interest Income' : '利息收入',
+    'Normalized Income' : '标准化收入',
+    'Net Income From Continuing And Discontinued Operation' : '持续经营和终止经营净利润',
+    'Total Expenses' : '总费用',
+    'Total Operating Income As Reported' : '报告的总营业收入',
+    'Diluted Average Shares' : '稀释平均股数' ,
     # 添加更多术语翻译...
 }
 
@@ -72,7 +89,7 @@ def create_stock_chart(stock_price):
 income_statement, balance_sheet, cash_flow = get_financial_data_('GOOG')
 
 #%%
-balance_sheet.iloc[0:3]
+print(balance_sheet)
 #%%
 # 将DataFrame转换为HTML表格
 # income_html = income_statement.to_html(classes='table table-striped')
